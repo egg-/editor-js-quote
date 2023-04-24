@@ -3,7 +3,7 @@
  */
 import './index.css';
 
-import { IconAlignLeft, IconAlignCenter, IconQuote } from '@codexteam/icons';
+import { IconQuote } from '@codexteam/icons';
 
 /**
  * @class Quote
@@ -15,20 +15,11 @@ import { IconAlignLeft, IconAlignCenter, IconQuote } from '@codexteam/icons';
  * @description Quote Tool`s input and output data
  * @property {string} text - quote`s text
  * @property {string} caption - quote`s caption
- * @property {'center'|'left'} alignment - quote`s alignment
  *
  * @typedef {object} QuoteConfig
  * @description Quote Tool`s initial configuration
  * @property {string} quotePlaceholder - placeholder to show in quote`s text input
  * @property {string} captionPlaceholder - placeholder to show in quote`s caption input
- * @property {'center'|'left'} defaultAlignment - alignment to use as default
- *
- * @typedef {object} TunesMenuConfig
- * @property {string} icon - menu item icon
- * @property {string} label - menu item label
- * @property {boolean} isActive - true if item should be in active state
- * @property {boolean} closeOnActivate - if true tunes menu should close once any item is selected
- * @property {() => void} onActivate - item activation callback
  */
 export default class Quote {
   /**
@@ -65,16 +56,6 @@ export default class Quote {
   }
 
   /**
-   * Allow to press Enter inside the Quote
-   *
-   * @public
-   * @returns {boolean}
-   */
-  static get enableLineBreaks() {
-    return true;
-  }
-
-  /**
    * Default placeholder for quote text
    *
    * @public
@@ -92,29 +73,6 @@ export default class Quote {
    */
   static get DEFAULT_CAPTION_PLACEHOLDER() {
     return 'Enter a caption';
-  }
-
-  /**
-   * Allowed quote alignments
-   *
-   * @public
-   * @returns {{left: string, center: string}}
-   */
-  static get ALIGNMENTS() {
-    return {
-      left: 'left',
-      center: 'center',
-    };
-  }
-
-  /**
-   * Default quote alignment
-   *
-   * @public
-   * @returns {string}
-   */
-  static get DEFAULT_ALIGNMENT() {
-    return Quote.ALIGNMENTS.left;
   }
 
   /**
@@ -159,16 +117,7 @@ export default class Quote {
    * @returns {*[]}
    */
   get settings() {
-    return [
-      {
-        name: 'left',
-        icon: IconAlignLeft,
-      },
-      {
-        name: 'center',
-        icon: IconAlignCenter,
-      },
-    ];
+    return [];
   }
 
   /**
@@ -181,8 +130,6 @@ export default class Quote {
    *   readOnly - read-only mode flag
    */
   constructor({ data, config, api, readOnly }) {
-    const { ALIGNMENTS, DEFAULT_ALIGNMENT } = Quote;
-
     this.api = api;
     this.readOnly = readOnly;
 
@@ -192,9 +139,6 @@ export default class Quote {
     this.data = {
       text: data.text || '',
       caption: data.caption || '',
-      alignment: Object.values(ALIGNMENTS).includes(data.alignment) && data.alignment ||
-      config.defaultAlignment ||
-      DEFAULT_ALIGNMENT,
     };
   }
 
@@ -249,39 +193,8 @@ export default class Quote {
       },
       caption: {
         br: true,
-      },
-      alignment: {},
+      }
     };
-  }
-
-  /**
-   * Create wrapper for Tool`s settings buttons:
-   * 1. Left alignment
-   * 2. Center alignment
-   *
-   * @returns {TunesMenuConfig}
-   *
-   */
-  renderSettings() {
-    const capitalize = str => str[0].toUpperCase() + str.substr(1);
-
-    return this.settings.map(item => ({
-      icon: item.icon,
-      label: this.api.i18n.t(`Align ${capitalize(item.name)}`),
-      onActivate: () => this._toggleTune(item.name),
-      isActive: this.data.alignment === item.name,
-      closeOnActivate: true,
-    }));
-  };
-
-  /**
-   * Toggle quote`s alignment
-   *
-   * @param {string} tune - alignment
-   * @private
-   */
-  _toggleTune(tune) {
-    this.data.alignment = tune;
   }
 
   /**
